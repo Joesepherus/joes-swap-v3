@@ -360,7 +360,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
 
         flashloanReceiver.flashloan_receive(amount, address(token));
 
-        uint256 fee = (amount * FEE) / 100;
+        uint256 fee = (amount * FEE) / ONE_HUNDRED;
         uint256 balanceAfter = token.balanceOf(address(this));
 
         if (balanceAfter < reserve + fee) {
