@@ -227,7 +227,7 @@ contract JoesSwapV3Test is Test {
 
     function test_flashloan() public {
         flashloanReceiver.flashloan(300, address(token0));
-//        flashloanReceiver.flashloan(100, address(token1));
+        flashloanReceiver.flashloan(100, address(token1));
     }
 
 

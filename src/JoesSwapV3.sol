@@ -66,7 +66,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     event Flashloan(
         address indexed sender,
         uint256 indexed amount,
-        uint256 indexed fee
+        uint256 indexed fee,
+        address token
     );
 
     /*//////////////////////////////////////////////////////////////
@@ -339,43 +340,33 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
 
     function flashloan(uint256 amount, address token) external nonReentrant {
         require(amount > 0, "Amount has to be more than zero");
-        uint256 reserve;
-        uint256 fee;
         if (token == address(token0)) {
-            reserve = reserve0;
-            require(amount < reserve0);
-            token0.safeTransfer(msg.sender, amount);
-            IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(
-                msg.sender
-            );
-
-            flashloanReceiver.flashloan_receive(amount, token);
-
-            fee = (amount * FEE) / 100;
-            uint256 token0Reserve = token0.balanceOf(address(this));
-
-            if (token0Reserve < reserve + fee) {
-                revert("You need to pay back the loan and the fee.");
-            }
+            _executeFlashLoan(amount, token0, reserve0);
+        } else if (token == address(token1)) {
+            _executeFlashLoan(amount, token1, reserve1);
+        } else {
+            revert("Invalid token address");
         }
-        if (token == address(token1)) {
-            reserve = reserve1;
-            require(amount < reserve1);
-            token1.safeTransfer(msg.sender, amount);
+    }
 
-            IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(
-                msg.sender
-            );
-            flashloanReceiver.flashloan_receive(amount, token);
+    function _executeFlashLoan(
+        uint256 amount,
+        IERC20 token,
+        uint256 reserve
+    ) internal {
+        require(amount < reserve);
+        token.safeTransfer(msg.sender, amount);
+        IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(msg.sender);
 
-            fee = (amount * FEE) / 100;
-            uint256 token1Reserve = token1.balanceOf(address(this));
+        flashloanReceiver.flashloan_receive(amount, address(token));
 
-            if (token1Reserve < reserve + fee) {
-                revert("You have to pay back the loan and the fee.");
-            }
+        uint256 fee = (amount * FEE) / 100;
+        uint256 balanceAfter = token.balanceOf(address(this));
+
+        if (balanceAfter < reserve + fee) {
+            revert("You need to pay back the loan and the fee.");
         }
-        emit Flashloan(msg.sender, amount, fee);
+        emit Flashloan(msg.sender, amount, fee, address(token));
     }
 
     /**
