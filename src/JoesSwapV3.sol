@@ -6,6 +6,7 @@ import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IFlashloanReceiver} from "./IFlashloanReceiver.sol";
 
 /**
  * @title JoesSwapV3
@@ -62,6 +63,11 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 indexed amount1
     );
     event WithdrawFees(address indexed sender, uint256 indexed feeAmount);
+    event Flashloan(
+        address indexed sender,
+        uint256 indexed amount,
+        uint256 indexed fee
+    );
 
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
@@ -329,6 +335,47 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
 
             token1.safeTransfer(msg.sender, feeShareToken1);
         }
+    }
+
+    function flashloan(uint256 amount, address token) external nonReentrant {
+        require(amount > 0, "Amount has to be more than zero");
+        uint256 reserve;
+        uint256 fee;
+        if (token == address(token0)) {
+            reserve = reserve0;
+            require(amount < reserve0);
+            token0.safeTransfer(msg.sender, amount);
+            IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(
+                msg.sender
+            );
+
+            flashloanReceiver.flashloan_receive(amount, token);
+
+            fee = (amount * FEE) / 100;
+            uint256 token0Reserve = token0.balanceOf(address(this));
+
+            if (token0Reserve < reserve + fee) {
+                revert("You need to pay back the loan and the fee.");
+            }
+        }
+        if (token == address(token1)) {
+            reserve = reserve1;
+            require(amount < reserve1);
+            token1.safeTransfer(msg.sender, amount);
+
+            IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(
+                msg.sender
+            );
+            flashloanReceiver.flashloan_receive(amount, token);
+
+            fee = (amount * FEE) / 100;
+            uint256 token1Reserve = token1.balanceOf(address(this));
+
+            if (token1Reserve < reserve + fee) {
+                revert("You have to pay back the loan and the fee.");
+            }
+        }
+        emit Flashloan(msg.sender, amount, fee);
     }
 
     /**
