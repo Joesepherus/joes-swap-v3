@@ -92,10 +92,10 @@ contract Governance {
                 proposal.data,
                 (address, address)
             );
-            joesSwapFactory.createPool(tokenA, tokenB);
-        }
-        else if(proposal.proposalType == ProposalType.CHANGE_FEE) {
-            (uint256 fee) = abi.decode(proposal.data, (uint256));
+            address createdPool = joesSwapFactory.createPool(tokenA, tokenB);
+            require(createdPool != address(0), "Pool creation failed.");
+        } else if (proposal.proposalType == ProposalType.CHANGE_FEE) {
+            uint256 fee = abi.decode(proposal.data, (uint256));
             joesSwapFactory.changeFee(fee);
         }
     }
