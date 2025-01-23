@@ -4,8 +4,10 @@ pragma solidity 0.8.20;
 import {console} from "forge-std/Test.sol";
 import {JoesSwapV3} from "./JoesSwapV3.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract FlashloanReceiver {
+    using SafeERC20 for IERC20;
     JoesSwapV3 joesSwapV3;
     uint256 immutable FEE = 3;
 
@@ -19,11 +21,8 @@ contract FlashloanReceiver {
     }
 
     function flashloan_receive(uint256 amount, address token) external {
-        console.log("amount", amount);
         uint256 fee = (amount * FEE) / 100;
-        console.log("fee", fee);
-        console.log("amount + fee", amount + fee);
 
-        IERC20(token).transfer(address(joesSwapV3), amount + fee);
+        IERC20(token).safeTransfer(address(joesSwapV3), amount + fee);
     }
 }
