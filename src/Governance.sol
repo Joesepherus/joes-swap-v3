@@ -34,8 +34,12 @@ contract Governance {
     uint256 immutable VOTING_DURATION = 7 days;
     uint256 proposalCount = 0;
 
-    event ProposalCreated(uint256 id, string description, address proposer);
-    event Voted(uint256 proposalId, address voter);
+    event ProposalCreated(
+        uint256 indexed id,
+        string indexed description,
+        address indexed proposer
+    );
+    event Voted(uint256 indexed proposalId, address indexed voter);
 
     constructor(address _token) {
         joesSwapFactory = new JoesSwapFactory();
@@ -46,7 +50,7 @@ contract Governance {
         string memory description,
         ProposalType _proposalType,
         bytes memory data
-    ) public {
+    ) external {
         proposalCount++;
         proposals[proposalCount] = Proposal({
             id: proposalCount,
@@ -62,7 +66,7 @@ contract Governance {
         emit ProposalCreated(proposalCount, description, msg.sender);
     }
 
-    function vote(uint256 proposalId) public {
+    function vote(uint256 proposalId) external {
         Proposal storage proposal = proposals[proposalId];
         require(
             !voted[proposalId][msg.sender],
@@ -78,7 +82,7 @@ contract Governance {
         emit Voted(proposalId, msg.sender);
     }
 
-    function executeProposal(uint256 proposalId) public {
+    function executeProposal(uint256 proposalId) external {
         Proposal storage proposal = proposals[proposalId];
         uint256 totalSupply = token.totalSupply();
         uint256 minVotesNeeded = (totalSupply * QUORUM) / 100;
@@ -102,7 +106,7 @@ contract Governance {
 
     function getProposal(
         uint256 proposalId
-    ) public view returns (Proposal memory) {
+    ) external view returns (Proposal memory) {
         return proposals[proposalId];
     }
 }
