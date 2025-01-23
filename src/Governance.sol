@@ -33,6 +33,15 @@ contract Governance {
         emit ProposalCreated(proposalCount, description, msg.sender);
     }
 
+    function vote(uint256 proposalId) public {
+        bool votedAlready = voted[proposalId][msg.sender];
+        console.log("votedAlready", votedAlready);
+        require(!votedAlready, "Can't vote twice on the same proposal.");
+
+        Proposal memory proposal = proposals[proposalId];
+        proposal.voteCount += 1;
+        voted[proposalId][msg.sender] = true;
+    }
 
     function getProposal(
         uint256 proposalId

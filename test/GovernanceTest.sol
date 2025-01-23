@@ -20,4 +20,21 @@ contract JoesSwapV3Test is Test {
         console.log("proposal", proposal.description);
     }
 
+    function test_voteOnce() public {
+        governance.createProposal("Increase fee to 5%.");
+        Governance.Proposal memory proposal = governance.getProposal(1);
+        console.log("proposal", proposal.description);
+        vm.prank(USER);
+        governance.vote(1);
+    }
+
+    function test_voteTwice() public {
+        governance.createProposal("Increase fee to 5%.");
+        Governance.Proposal memory proposal = governance.getProposal(1);
+        console.log("proposal", proposal.description);
+        vm.startPrank(USER);
+        governance.vote(1);
+        vm.expectRevert("Can't vote twice on the same proposal.");
+        governance.vote(1);
+    }
 }
