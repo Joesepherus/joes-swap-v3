@@ -94,6 +94,10 @@ contract Governance {
             );
             joesSwapFactory.createPool(tokenA, tokenB);
         }
+        else if(proposa.proposalType == ProposalType.CHANGE_FEE) {
+            (uint256 fee) = abi.decode(proposal.data, (uint256));
+            joesSwapFactory.changeFee();
+        }
     }
 
     function getProposal(
