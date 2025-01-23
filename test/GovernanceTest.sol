@@ -3,15 +3,22 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {Governance} from "../src/Governance.sol";
+import {ERC20Mock} from "./ERC20Mock.sol";
 
 contract JoesSwapV3Test is Test {
     Governance governance;
+    ERC20Mock token;
 
     address USER = address(0x4eFF9F6DBb11A3D9a18E92E35BD4D54ac4E1533a);
     address USER2 = address(2);
 
+    uint256 STARTING_AMOUNT = 1_000;
+
     function setUp() public {
-        governance = new Governance();
+        token = new ERC20Mock("Token", "T");
+        governance = new Governance(address(token));
+
+        token.mint(USER, STARTING_AMOUNT);
     }
 
     function test_createProposal() public {
