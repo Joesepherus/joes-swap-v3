@@ -1,4 +1,4 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.20;
 
 import {JoesSwapV3} from "./JoesSwapV3.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
