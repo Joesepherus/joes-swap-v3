@@ -1,7 +1,7 @@
-# Joes Swap v2
-Upgraded version of Joes Swap v1.
+# Joes Swap v3
+Upgraded version of Joes Swap v2.
 
-## What got introduced in v2
+## What got introduced in v3
 1. Add flashloans
 2. Add Governance contract for controlling the DEX
 3. Add Factory for deploying pools new token pairs of DEX
