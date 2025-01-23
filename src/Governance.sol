@@ -43,20 +43,25 @@ contract Governance {
 
     function vote(uint256 proposalId) public {
         bool votedAlready = voted[proposalId][msg.sender];
-        console.log("votedAlready", votedAlready);
         require(!votedAlready, "Can't vote twice on the same proposal.");
         uint256 balance = token.balanceOf(msg.sender);
         require(balance > 0, "You have to own tokens to vote.");
 
-
-        Proposal memory proposal = proposals[proposalId];
+        Proposal storage proposal = proposals[proposalId];
         proposal.voteCount += balance;
         voted[proposalId][msg.sender] = true;
 
         emit Voted(proposalId, msg.sender);
     }
 
-    function executeProposal() public {}
+    function executeProposal(uint256 proposalId) public {
+        bool votedAlready = voted[proposalId][msg.sender];
+        Proposal storage proposal = proposals[proposalId];
+        uint256 totalSupply = token.totalSupply();
+        uint256 minVotesNeeded = (totalSupply * QUORUM)/100;
+        require(proposal.voteCount > minVotesNeeded, "Need atleast 70% of votes.");
+        proposal.executed = true;
+    }
 
     function getProposal(
         uint256 proposalId
