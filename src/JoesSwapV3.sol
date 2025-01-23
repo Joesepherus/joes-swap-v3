@@ -354,7 +354,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         IERC20 token,
         uint256 reserve
     ) internal {
-        require(amount < reserve);
+        require(amount < reserve, "Not enough funds in the pool to loan out.");
         token.safeTransfer(msg.sender, amount);
         IFlashloanReceiver flashloanReceiver = IFlashloanReceiver(msg.sender);
 
