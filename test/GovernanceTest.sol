@@ -45,6 +45,15 @@ contract JoesSwapV3Test is Test {
         governance.vote(1);
     }
 
+    function test_voteAfterDeadline() public {
+        governance.createProposal("Increase fee to 5%.");
+        Governance.Proposal memory proposal = governance.getProposal(1);
+        console.log("proposal", proposal.description);
+        vm.warp(8 days);
+        vm.startPrank(USER);
+        governance.vote(1);
+    }
+
     function test_executeProposal() public {
         governance.createProposal("Increase fee to 5%.");
         Governance.Proposal memory proposal = governance.getProposal(1);
@@ -53,4 +62,17 @@ contract JoesSwapV3Test is Test {
         governance.vote(1);
         governance.executeProposal(1);
     }
+
+    function test_executeProposalFail() public {
+        token.mint(USER2, STARTING_AMOUNT);
+        governance.createProposal("Increase fee to 5%.");
+        Governance.Proposal memory proposal = governance.getProposal(1);
+        console.log("proposal", proposal.description);
+        vm.startPrank(USER);
+        governance.vote(1);
+        vm.expectRevert("Need atleast 70% of votes.");
+        governance.executeProposal(1);
+    }
+
+
 }

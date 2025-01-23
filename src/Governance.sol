@@ -16,6 +16,7 @@ contract Governance {
         uint256 voteCount;
         bool executed;
         address proposer;
+        uint256 deadline;
     }
     mapping(uint256 => Proposal) proposals;
     mapping(uint256 => mapping(address => bool)) public voted;
@@ -36,18 +37,20 @@ contract Governance {
             description: description,
             voteCount: 0,
             executed: false,
-            proposer: msg.sender
+            proposer: msg.sender,
+            deadline: block.timestamp + VOTING_DURATION
         });
+
         emit ProposalCreated(proposalCount, description, msg.sender);
     }
 
     function vote(uint256 proposalId) public {
-        bool votedAlready = voted[proposalId][msg.sender];
-        require(!votedAlready, "Can't vote twice on the same proposal.");
+        Proposal storage proposal = proposals[proposalId];
+        require(!voted[proposalId][msg.sender], "Can't vote twice on the same proposal.");
+        require(block.timestamp <= proposal.deadline, "Voting is over.");
         uint256 balance = token.balanceOf(msg.sender);
         require(balance > 0, "You have to own tokens to vote.");
 
-        Proposal storage proposal = proposals[proposalId];
         proposal.voteCount += balance;
         voted[proposalId][msg.sender] = true;
 
@@ -55,10 +58,10 @@ contract Governance {
     }
 
     function executeProposal(uint256 proposalId) public {
-        bool votedAlready = voted[proposalId][msg.sender];
         Proposal storage proposal = proposals[proposalId];
         uint256 totalSupply = token.totalSupply();
         uint256 minVotesNeeded = (totalSupply * QUORUM)/100;
+        console.log("minVotesNeeded", minVotesNeeded);
         require(proposal.voteCount > minVotesNeeded, "Need atleast 70% of votes.");
         proposal.executed = true;
     }
