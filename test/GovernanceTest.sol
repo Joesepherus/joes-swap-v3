@@ -51,6 +51,7 @@ contract JoesSwapV3Test is Test {
         console.log("proposal", proposal.description);
         vm.warp(8 days);
         vm.startPrank(USER);
+        vm.expectRevert("Voting is over.");
         governance.vote(1);
     }
 
