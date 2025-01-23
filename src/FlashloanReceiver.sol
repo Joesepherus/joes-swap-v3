@@ -10,14 +10,15 @@ contract FlashloanReceiver {
     uint256 immutable FEE = 3;
 
     constructor(address _joesSwapV3) {
+        require(_joesSwapV3 != address(0), "Not a valid address.");
         joesSwapV3 = JoesSwapV3(_joesSwapV3);
     }
 
-    function flashloan(uint256 amount, address token) public {
+    function flashloan(uint256 amount, address token) external {
         joesSwapV3.flashloan(amount, token);
     }
 
-    function flashloan_receive(uint256 amount, address token) public {
+    function flashloan_receive(uint256 amount, address token) external {
         console.log("amount", amount);
         uint256 fee = (amount * FEE) / 100;
         console.log("fee", fee);
