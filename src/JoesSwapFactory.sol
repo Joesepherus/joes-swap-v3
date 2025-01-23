@@ -27,7 +27,7 @@ contract JoesSwapFactory is Ownable {
 
     // @FIXME: add changeFee logic and add it in JoesSwapV3 so that the already collected
     // fee is adjusted, not that all of a sudden they get much more than they are supposed to
-    function changeFee(uint256) {
+    function changeFee(uint256 fee) external {
          
     }
 }
