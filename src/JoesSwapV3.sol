@@ -359,18 +359,24 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Flash loans amount of tokens to the caller
-     * @dev The function checks if the amount is less than the protocols token reserve.
-     *      It then sends the amount of tokens to the caller and runs flashloan_receive 
-     *      on the callers contract.
-     *      Once the function flashloan_receive is complete on callers contract
-     *      the function then expects the caller to repay the loan plus fee. If 
-     *      that is not the case then it reverts otherwise it emits a successful event.
-     *      Emits a `Flashloan` event upon successful execution.
-     * @custom:revert "Not enough funds in the pool to loan out." if the amount is more 
-     *                than protocols token reserve.
-     * @custom:revert "You need to pay back the loan and the fee." if the loan amount 
-     *                plus the fee is not paid back to the protocol by the caller.
+     * @notice Flash loans a specified amount of tokens to the caller.
+     * @dev The function checks if the requested amount is less than the protocol's token reserve.
+     *      If the check passes, it sends the requested amount to the caller and triggers the
+     *      `flashloan_receive` function on the caller's contract.
+     *      Once the `flashloan_receive` function is complete, the caller is expected to repay the loan 
+     *      amount plus the fee. If the loan is not repaid as expected, the transaction will revert. 
+     *      On successful repayment, a `Flashloan` event is emitted.
+     *
+     * @param amount The amount of tokens to be loaned to the caller.
+     * @param token The token that will be loaned to the caller.
+     * @param reserve The protocol's reserve of the token.
+     *
+     * @custom:revert "Not enough funds in the pool to loan out." if the requested amount exceeds
+     *                the protocol's token reserve.
+     * @custom:revert "You need to pay back the loan and the fee." if the loan amount plus fee 
+     *                is not repaid by the caller.
+     * 
+     * @emits Flashloan event upon successful execution.
      */
     function _executeFlashLoan(
         uint256 amount,
