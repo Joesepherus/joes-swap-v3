@@ -339,13 +339,16 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Calls _executeFlashloan with the correct token
-     * @dev The function checks if the amount more than 0 and checks if the token 
-     *      is correct. 
-     *      It then calls internal function _executeFlashloan with the correct token.
-     * @custom:modifier nonReentrant Function cannot be re-entered
-     * @custom:revert "Amount has to be more than zero" if the amount is less than 0
-     * @custom:revert "Invalid token address" if the token is not token0 or token1
+     * @notice Calls _executeFlashloan with the correct token.
+     * @dev The function checks if the amount is greater than zero and validates the token address.
+     *      If both checks pass, it calls the internal function `_executeFlashloan` with the correct token.
+     *
+     * @param amount The amount of tokens to be loaned.
+     * @param token The token address to be used for the flash loan. It must be either `token0` or `token1`.
+     *
+     * @custom:modifier nonReentrant Ensures the function cannot be re-entered.
+     * @custom:revert "Amount has to be more than zero." if the amount is less than or equal to zero.
+     * @custom:revert "Invalid token address." if the token is neither `token0` nor `token1`.
      */
     function flashloan(uint256 amount, address token) external nonReentrant {
         require(amount > 0, "Amount has to be more than zero");
