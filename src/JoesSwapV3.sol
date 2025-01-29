@@ -342,7 +342,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @notice Calls _executeFlashloan with the correct token
      * @dev The function checks if the amount more than 0 and checks if the token 
      *      is correct. 
-     *      It then calls internal function _executeFlashloan with the correct token
+     *      It then calls internal function _executeFlashloan with the correct token.
      * @custom:modifier nonReentrant Function cannot be re-entered
      * @custom:revert "Amount has to be more than zero" if the amount is less than 0
      * @custom:revert "Invalid token address" if the token is not token0 or token1
@@ -358,6 +358,19 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         }
     }
 
+    /**
+     * @notice Flash loans amount of tokens to the caller
+     * @dev The function checks if the amount is less than the protocols token reserve.
+     *      It then sends the amount of tokens to the caller and runs flashloan_receive 
+     *      on the callers contract.
+     *      Once the function flashloan_receive is complete on callers contract
+     *      the function then expects the caller to repay the loan plus fee. If 
+     *      that is not the case then it reverts otherwise it emits a successful event
+     * @custom:revert "Not enough funds in the pool to loan out." if the amount is more 
+     *                than protocols token reserve.
+     * @custom:revert "You need to pay back the loan and the fee." if the loan amount 
+     *                plus the fee is not paid back to the protocol by the caller.
+     */
     function _executeFlashLoan(
         uint256 amount,
         IERC20 token,
