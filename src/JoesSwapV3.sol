@@ -365,7 +365,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      *      on the callers contract.
      *      Once the function flashloan_receive is complete on callers contract
      *      the function then expects the caller to repay the loan plus fee. If 
-     *      that is not the case then it reverts otherwise it emits a successful event
+     *      that is not the case then it reverts otherwise it emits a successful event.
+     *      Emits a `Flashloan` event upon successful execution.
      * @custom:revert "Not enough funds in the pool to loan out." if the amount is more 
      *                than protocols token reserve.
      * @custom:revert "You need to pay back the loan and the fee." if the loan amount 
