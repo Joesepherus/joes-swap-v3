@@ -2,13 +2,13 @@
 pragma solidity 0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Governance} from "../src/Governance.sol";
+import {JoesGovernance} from "../src/JoesGovernance.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
 import {JoesSwapFactory} from "../src/JoesSwapFactory.sol";
 import {JoesGovernanceToken} from "../src/JoesGovernanceToken.sol";
 
-contract GovernanceTest is Test {
-    Governance governance;
+contract JoesGovernanceTest is Test {
+    JoesGovernance governance;
     JoesGovernanceToken token;
 
     address OWNER = address(0x4eFF9F6DBb11A3D9a18E92E35BD4D54ac4E1533a);
@@ -20,7 +20,7 @@ contract GovernanceTest is Test {
     function setUp() public {
         vm.prank(USER);
         token = new JoesGovernanceToken(1_000_000);
-        governance = new Governance(address(token));
+        governance = new JoesGovernance(address(token));
 
     }
 
@@ -29,10 +29,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
     }
 
@@ -41,10 +41,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.prank(USER);
         governance.vote(1);
@@ -55,10 +55,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.startPrank(USER);
         governance.vote(1);
@@ -71,10 +71,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.warp(8 days);
         vm.startPrank(USER);
@@ -87,10 +87,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.startPrank(USER);
         governance.vote(1);
@@ -102,14 +102,14 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(fee);
         governance.createProposal(
             "Increase fee to 5%.",
-            Governance.ProposalType.CHANGE_FEE,
+            JoesGovernance.ProposalType.CHANGE_FEE,
             data
         );
         vm.prank(USER);
         token.transfer(USER2, 300_000 * 10 ** 18);
         uint256 balanceUSER =token.balanceOf(USER);
         console.log("balanceUSER", balanceUSER);
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.startPrank(USER);
         governance.vote(1);
@@ -123,10 +123,10 @@ contract GovernanceTest is Test {
         bytes memory data = abi.encode(ETH, USD);
         governance.createProposal(
             "Create new pool for ETH:USD.",
-            Governance.ProposalType.CREATE_POOL,
+            JoesGovernance.ProposalType.CREATE_POOL,
             data
         );
-        Governance.Proposal memory proposal = governance.getProposal(1);
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.startPrank(USER);
         governance.vote(1);

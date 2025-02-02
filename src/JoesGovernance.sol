@@ -7,7 +7,7 @@ import {JoesSwapFactory} from "../src/JoesSwapFactory.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract Governance {
+contract JoesGovernance {
     using SafeERC20 for IERC20;
     JoesSwapFactory public joesSwapFactory;
     IERC20 public immutable token;
