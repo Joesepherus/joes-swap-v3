@@ -5,10 +5,11 @@ import {Test, console} from "forge-std/Test.sol";
 import {Governance} from "../src/Governance.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
 import {JoesSwapFactory} from "../src/JoesSwapFactory.sol";
+import {JoesGovernanceToken} from "../src/JoesGovernanceToken.sol";
 
 contract GovernanceTest is Test {
     Governance governance;
-    ERC20Mock token;
+    JoesGovernanceToken token;
 
     address OWNER = address(0x4eFF9F6DBb11A3D9a18E92E35BD4D54ac4E1533a);
     address USER = address(1);
@@ -17,10 +18,10 @@ contract GovernanceTest is Test {
     uint256 STARTING_AMOUNT = 1_000;
 
     function setUp() public {
-        token = new ERC20Mock("Token", "T");
+        vm.prank(USER);
+        token = new JoesGovernanceToken(1_000_000);
         governance = new Governance(address(token));
 
-        token.mint(USER, STARTING_AMOUNT);
     }
 
     function test_createProposal() public {
@@ -104,7 +105,10 @@ contract GovernanceTest is Test {
             Governance.ProposalType.CHANGE_FEE,
             data
         );
-        token.mint(USER2, STARTING_AMOUNT);
+        vm.prank(USER);
+        token.transfer(USER2, 300_000 * 10 ** 18);
+        uint256 balanceUSER =token.balanceOf(USER);
+        console.log("balanceUSER", balanceUSER);
         Governance.Proposal memory proposal = governance.getProposal(1);
         console.log("proposal", proposal.description);
         vm.startPrank(USER);
