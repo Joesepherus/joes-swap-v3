@@ -380,7 +380,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @custom:revert "You need to pay back the loan and the fee." if the loan amount plus fee 
      *                is not repaid by the caller.
      * 
-     * @emits Flashloan event upon successful execution.
+     * Emits a `Flashloan` event upon successful execution.
      */
     function _executeFlashLoan(
         uint256 amount,
