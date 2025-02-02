@@ -12,3 +12,4 @@ This is a very basic implementation of a Decentralized Exchange using Solidity a
 1. Make the swaps non-linear
 2. Hand out LP tokens to liquidity providers
 3. Add checks
+4. Add natspec to Governance JoesSwapFactory and FlasloanReceiver
