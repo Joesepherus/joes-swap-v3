@@ -263,6 +263,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 scaledAmountIn = amountIn * PRECISION;
 
         uint256 amountOutScaled = getAmountIn(scaledAmountIn);
+        if (amountOutScaled < PRECISION) revert("Amount out too small");
         uint256 amountOutRounded = roundDownToNearestWhole(amountOutScaled);
         uint256 amountOut = amountOutRounded / PRECISION;
 
