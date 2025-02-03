@@ -76,6 +76,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     error InsufficentFeesBalance();
     error InsufficentLiquidity();
     error PoolAlreadyInitialized();
+    error PoolNotInitialized();
 
     constructor(address _token0, address _token1) Ownable(msg.sender) {
         token0 = IERC20(_token0);
@@ -136,6 +137,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @custom:modifier nonReentrant Function cannot be re-entered
      */
     function addLiquidity(uint256 amount0) external nonReentrant {
+        if (!poolInitialized) revert PoolNotInitialized();
+
         uint256 amount0Scaled = amount0 * PRECISION;
 
         uint256 amount1Scaled = getAmountOut(amount0Scaled);
@@ -207,6 +210,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @custom:revert "Invalid output amount" if the calculated amount of token1 is less than 0
      */
     function swapToken0Amount(uint256 amountIn) external nonReentrant {
+        if (!poolInitialized) revert PoolNotInitialized();
         uint256 scaledAmountIn = amountIn * PRECISION;
 
         uint256 amountOutScaled = getAmountOut(scaledAmountIn);
@@ -260,6 +264,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 amountIn,
         uint256 amountInMax
     ) external nonReentrant {
+        if (!poolInitialized) revert PoolNotInitialized();
         uint256 scaledAmountIn = amountIn * PRECISION;
 
         uint256 amountOutScaled = getAmountIn(scaledAmountIn);
