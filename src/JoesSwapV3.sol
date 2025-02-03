@@ -89,16 +89,15 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
 
     /**
      * @notice Initializes the pool with the provided liquidity amounts of token0 and token1.
-     * @dev This function can only be called once and by the owner.
+     * @dev This function can be called by anyone but only once.
      *      It transfers the specified amounts of token0 and token1 from the caller to the contract,
      *      calculates the new liquidity, updates reserves, and records the user's entry per liquidity unit.
      *      Emits a `PoolInitialized` event upon successful execution.
      * @param amount0 The amount of token0 to add to the pool.
      * @param amount1 The amount of token1 to add to the pool.
-     * @custom:modifier onlyOwner Can only be called by the contract owner.
      * @custom:revert PoolAlreadyInitialized if the pool has already been initialized.
      */
-    function initializePoolLiquidity(
+    function setupPoolLiquidity(
         uint256 amount0,
         uint256 amount1
     ) external {
