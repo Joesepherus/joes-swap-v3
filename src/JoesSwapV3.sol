@@ -39,6 +39,8 @@ contract JoesSwapV3 is ReentrancyGuard {
     uint256 immutable PRECISION = 1e18;
     uint256 immutable FEE = 3;
     uint256 immutable ONE_HUNDRED = 100;
+    uint256 immutable TEN = 10;
+    uint256 immutable EIGHTEEN = 18;
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
@@ -85,8 +87,8 @@ contract JoesSwapV3 is ReentrancyGuard {
         token1 = IERC20(_token1);
         uint256 decimals0 = IERC20Metadata(_token0).decimals();
         uint256 decimals1 = IERC20Metadata(_token1).decimals();
-        scaleAmount0 = 10 ** (18 - decimals0);
-        scaleAmount1 = 10 ** (18 - decimals1);
+        scaleAmount0 = TEN ** (EIGHTEEN - decimals0);
+        scaleAmount1 = TEN ** (EIGHTEEN - decimals1);
     }
 
     /*//////////////////////////////////////////////////////////////
