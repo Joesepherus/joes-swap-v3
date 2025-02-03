@@ -3,10 +3,11 @@ pragma solidity 0.8.20;
 
 import {console} from "forge-std/Test.sol";
 import {JoesSwapV3} from "./JoesSwapV3.sol";
+import {IFlashloanReceiver} from "./IFlashloanReceiver.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract FlashloanReceiver {
+contract FlashloanReceiver is IFlashloanReceiver{
     using SafeERC20 for IERC20;
     JoesSwapV3 joesSwapV3;
     uint256 immutable FEE = 3;
