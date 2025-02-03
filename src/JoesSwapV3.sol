@@ -206,10 +206,12 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      *      Updates reserves of the pool.
      *      Emits a `Swap` event upon successful execution.
      * @param amountIn The amount of token0 to add to the pool.
+     * @param amountInMax Maximum amount of token0 to send to the pool.
      * @custom:modifier nonReentrant Function cannot be re-entered
      * @custom:revert "Invalid output amount" if the calculated amount of token1 is less than 0
+     * @custom:revert "Slippage free amountIn too big" if the calculated amount of token0 is more than amountInMax
      */
-    function swapToken0Amount(uint256 amountIn) external nonReentrant {
+    function swapToken0Amount(uint256 amountIn, uint256 amountInMax) external nonReentrant {
         if (!poolInitialized) revert PoolNotInitialized();
         uint256 scaledAmountIn = amountIn * PRECISION;
 
@@ -226,6 +228,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
         uint256 amountInSlippageFree = amountInRouded / PRECISION;
 
+        if(amountInSlippageFree > amountInMax) revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
         accumulatedFeePerLiquidityUnitToken0 +=
@@ -256,9 +259,11 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      *      Transfers amount token1 to the pool and transfers amount token0 to the caller.
      *      Updates reserves of the pool.
      *      Emits a `Swap` event upon successful execution.
-     * @param amountIn The amount of token0 to add to the pool.
+     * @param amountIn The amount of token1 to add to the pool.
+     * @param amountInMax Maximum amount of token1 to send to the pool.
      * @custom:modifier nonReentrant Function cannot be re-entered
      * @custom:revert "Invalid output amount" if the calculated amount of token1 is less than 0
+     * @custom:revert "Slippage free amountIn too big" if the calculated amount of token1 is more than amountInMax
      */
     function swapToken1Amount(
         uint256 amountIn,
@@ -280,6 +285,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
         uint256 amountInSlippageFree = amountInRouded / PRECISION;
 
+        if(amountInSlippageFree > amountInMax) revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
         accumulatedFeePerLiquidityUnitToken1 +=
