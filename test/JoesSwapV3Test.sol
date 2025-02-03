@@ -92,7 +92,7 @@ contract JoesSwapV3Test is Test {
         uint256 reserve1Before = joesSwapV3.reserve1();
 
         vm.prank(owner);
-        joesSwapV3.swapToken0Amount(swapAmount);
+        joesSwapV3.swapToken0Amount(swapAmount, 1100);
 
         uint256 reserve1AfterExpected = (reserve0Before * reserve1Before) /
             (reserve0Before + swapAmount);
