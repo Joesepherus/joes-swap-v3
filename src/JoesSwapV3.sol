@@ -4,7 +4,6 @@ pragma solidity 0.8.20;
 import {Test, console} from "forge-std/Test.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
-import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IFlashloanReceiver} from "./IFlashloanReceiver.sol";
 
@@ -13,7 +12,7 @@ import {IFlashloanReceiver} from "./IFlashloanReceiver.sol";
  * @author Joesepherus
  * @dev Decentralized token swapping contract with liquidity provision and fee management.
  */
-contract JoesSwapV3 is ReentrancyGuard, Ownable {
+contract JoesSwapV3 is ReentrancyGuard {
     using SafeERC20 for IERC20;
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
@@ -78,7 +77,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     error PoolAlreadyInitialized();
     error PoolNotInitialized();
 
-    constructor(address _token0, address _token1) Ownable(msg.sender) {
+    constructor(address _token0, address _token1) {
         token0 = IERC20(_token0);
         token1 = IERC20(_token1);
     }
@@ -97,10 +96,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @param amount1 The amount of token1 to add to the pool.
      * @custom:revert PoolAlreadyInitialized if the pool has already been initialized.
      */
-    function setupPoolLiquidity(
-        uint256 amount0,
-        uint256 amount1
-    ) external {
+    function setupPoolLiquidity(uint256 amount0, uint256 amount1) external {
         if (poolInitialized) revert PoolAlreadyInitialized();
         uint256 amount0Scaled = amount0 * PRECISION;
         uint256 amount1Scaled = amount1 * PRECISION;
@@ -210,7 +206,10 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @custom:revert "Invalid output amount" if the calculated amount of token1 is less than 0
      * @custom:revert "Slippage free amountIn too big" if the calculated amount of token0 is more than amountInMax
      */
-    function swapToken0Amount(uint256 amountIn, uint256 amountInMax) external nonReentrant {
+    function swapToken0Amount(
+        uint256 amountIn,
+        uint256 amountInMax
+    ) external nonReentrant {
         if (!poolInitialized) revert PoolNotInitialized();
         uint256 scaledAmountIn = amountIn * PRECISION;
 
@@ -227,7 +226,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
         uint256 amountInSlippageFree = amountInRouded / PRECISION;
 
-        if(amountInSlippageFree > amountInMax) revert("Slippage free amountIn too big");
+        if (amountInSlippageFree > amountInMax)
+            revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
         accumulatedFeePerLiquidityUnitToken0 +=
@@ -284,7 +284,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
         uint256 amountInSlippageFree = amountInRouded / PRECISION;
 
-        if(amountInSlippageFree > amountInMax) revert("Slippage free amountIn too big");
+        if (amountInSlippageFree > amountInMax)
+            revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
         accumulatedFeePerLiquidityUnitToken1 +=
@@ -377,8 +378,8 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      * @dev The function checks if the requested amount is less than the protocol's token reserve.
      *      If the check passes, it sends the requested amount to the caller and triggers the
      *      `flashloan_receive` function on the caller's contract.
-     *      Once the `flashloan_receive` function is complete, the caller is expected to repay the loan 
-     *      amount plus the fee. If the loan is not repaid as expected, the transaction will revert. 
+     *      Once the `flashloan_receive` function is complete, the caller is expected to repay the loan
+     *      amount plus the fee. If the loan is not repaid as expected, the transaction will revert.
      *      On successful repayment, a `Flashloan` event is emitted.
      *
      * @param amount The amount of tokens to be loaned to the caller.
@@ -387,9 +388,9 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
      *
      * @custom:revert "Not enough funds in the pool to loan out." if the requested amount exceeds
      *                the protocol's token reserve.
-     * @custom:revert "You need to pay back the loan and the fee." if the loan amount plus fee 
+     * @custom:revert "You need to pay back the loan and the fee." if the loan amount plus fee
      *                is not repaid by the caller.
-     * 
+     *
      * Emits a `Flashloan` event upon successful execution.
      */
     function _executeFlashLoan(

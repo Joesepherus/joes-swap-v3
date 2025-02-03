@@ -49,7 +49,7 @@ contract JoesSwapV3Test is Test {
         uint256 amount0 = 10000;
         uint256 amount1 = 1000;
         vm.prank(owner);
-        joesSwapV3.initializePoolLiquidity(amount0, amount1);
+        joesSwapV3.setupPoolLiquidity(amount0, amount1);
         console.log("initialized", joesSwapV3.poolInitialized());
 
         flashloanReceiver = new FlashloanReceiver(address(joesSwapV3));
@@ -65,7 +65,7 @@ contract JoesSwapV3Test is Test {
         console.log("liquidity", joesSwapV3.liquidity());
         vm.prank(owner);
        vm.expectRevert();
-        joesSwapV3.initializePoolLiquidity(amount0, amount1);
+        joesSwapV3.setupPoolLiquidity(amount0, amount1);
     }
 
     function test_addLiquidity() public {
