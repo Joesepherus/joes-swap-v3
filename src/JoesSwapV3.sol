@@ -100,7 +100,7 @@ contract JoesSwapV3 is ReentrancyGuard, Ownable {
     function initializePoolLiquidity(
         uint256 amount0,
         uint256 amount1
-    ) external onlyOwner {
+    ) external {
         if (poolInitialized) revert PoolAlreadyInitialized();
         uint256 amount0Scaled = amount0 * PRECISION;
         uint256 amount1Scaled = amount1 * PRECISION;
