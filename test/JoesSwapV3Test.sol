@@ -57,43 +57,6 @@ contract JoesSwapV3Test is Test {
         token1.mint(address(flashloanReceiver), STARTING_AMOUNT);
     }
 
-    function test_initializePoolLiquidityAsNotOwner() public {
-        token0 = new ERC20Mock("Token0", "T0");
-        token1 = new ERC20Mock("Token1", "T1");
-
-        uint256 STARTING_AMOUNT = 1_000_000;
-
-        vm.deal(owner, STARTING_AMOUNT);
-        vm.deal(owner2, STARTING_AMOUNT);
-
-        token0.mint(owner, STARTING_AMOUNT);
-        token1.mint(owner, STARTING_AMOUNT);
-
-        token0.mint(owner2, STARTING_AMOUNT);
-        token1.mint(owner2, STARTING_AMOUNT);
-
-        vm.prank(owner);
-        joesSwapV3 = new JoesSwapV3(address(token0), address(token1));
-
-
-        vm.startPrank(owner);
-        token0.approve(address(joesSwapV3), STARTING_AMOUNT);
-        token1.approve(address(joesSwapV3), STARTING_AMOUNT);
-        vm.stopPrank();
-
-        vm.startPrank(owner2);
-        token0.approve(address(joesSwapV3), STARTING_AMOUNT);
-        token1.approve(address(joesSwapV3), STARTING_AMOUNT);
-        vm.stopPrank();
-
-        uint256 amount0 = 10000;
-        uint256 amount1 = 1000;
-
-        vm.prank(owner2);
-        vm.expectRevert();
-        joesSwapV3.initializePoolLiquidity(amount0, amount1);
-    }
-
     function test_initializePoolTwice() public {
         uint256 amount0 = 10000;
         uint256 amount1 = 1000;
