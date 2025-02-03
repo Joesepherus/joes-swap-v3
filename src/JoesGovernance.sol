@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
-import {console} from "forge-std/Test.sol";
 import {JoesSwapV3} from "./JoesSwapV3.sol";
 import {JoesSwapFactory} from "../src/JoesSwapFactory.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
