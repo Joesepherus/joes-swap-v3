@@ -119,7 +119,7 @@ contract JoesGovernanceTest is Test {
 
     function test_executeProposalCreatePool() public {
         ERC20Mock ETH = new ERC20Mock("Ethereum", "ETH");
-        ERC20Mock USD = new ERC20Mock("US dolla", "USD");
+        ERC20Mock USD = new ERC20Mock("US dollar", "USD");
         bytes memory data = abi.encode(ETH, USD);
         governance.createProposal(
             "Create new pool for ETH:USD.",
@@ -138,4 +138,5 @@ contract JoesGovernanceTest is Test {
         );
         assert(ETHUSDPool != address(0));
     }
+
 }
