@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {JoesSwapV3} from "../src/JoesSwapV3.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
+import {WeirdERC20Mock} from "./WeirdERC20Mock.sol";
 import {FlashloanReceiver} from "../src/FlashloanReceiver.sol";
 
 contract JoesSwapV3Test is Test {
@@ -57,6 +58,12 @@ contract JoesSwapV3Test is Test {
         token1.mint(address(flashloanReceiver), STARTING_AMOUNT);
     }
 
+    function test_weirdERC20() public {
+        WeirdERC20Mock weirdERC20 = new WeirdERC20Mock("Weird", "W");
+        vm.expectRevert();
+        joesSwapV3 = new JoesSwapV3(address(weirdERC20), address(token1));
+    }
+
     function test_initializePoolTwice() public {
         uint256 amount0 = 10000;
         uint256 amount1 = 1000;
@@ -64,7 +71,7 @@ contract JoesSwapV3Test is Test {
         console.log("initialized", joesSwapV3.poolInitialized());
         console.log("liquidity", joesSwapV3.liquidity());
         vm.prank(owner);
-       vm.expectRevert();
+        vm.expectRevert();
         joesSwapV3.setupPoolLiquidity(amount0, amount1);
     }
 
@@ -162,7 +169,6 @@ contract JoesSwapV3Test is Test {
         flashloanReceiver.flashloan(100, address(token1));
     }
 
-
     function sqrt(uint256 x) internal pure returns (uint256 y) {
         y = x;
         uint256 z = (x + 1) / 2;
@@ -172,6 +178,3 @@ contract JoesSwapV3Test is Test {
         }
     }
 }
-
-
-
