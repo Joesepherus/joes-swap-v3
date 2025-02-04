@@ -71,6 +71,7 @@ contract JoesGovernance {
             !voted[proposalId][msg.sender],
             "Can't vote twice on the same proposal."
         );
+        require(!proposal.executed, "Proposal has already been executed.");
         require(block.timestamp <= proposal.deadline, "Voting is over.");
         uint256 balance = token.balanceOf(msg.sender);
         require(balance > 0, "You have to own tokens to vote.");

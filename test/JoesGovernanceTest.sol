@@ -20,8 +20,9 @@ contract JoesGovernanceTest is Test {
     function setUp() public {
         vm.prank(USER);
         token = new JoesGovernanceToken(1_000_000);
+        vm.prank(USER);
+        token.transfer(USER2, 1_000);
         governance = new JoesGovernance(address(token));
-
     }
 
     function test_createProposal() public {
@@ -137,6 +138,32 @@ contract JoesGovernanceTest is Test {
             address(USD)
         );
         assert(ETHUSDPool != address(0));
+    }
+
+    function test_voteAfterProposalExecuted() public {
+        ERC20Mock ETH = new ERC20Mock("Ethereum", "ETH");
+        ERC20Mock USD = new ERC20Mock("US dollar", "USD");
+        bytes memory data = abi.encode(ETH, USD);
+        governance.createProposal(
+            "Create new pool for ETH:USD.",
+            JoesGovernance.ProposalType.CREATE_POOL,
+            data
+        );
+        JoesGovernance.Proposal memory proposal = governance.getProposal(1);
+        console.log("proposal", proposal.description);
+        vm.startPrank(USER);
+        governance.vote(1);
+        governance.executeProposal(1);
+        JoesSwapFactory joesSwapFactory = governance.joesSwapFactory();
+        address ETHUSDPool = joesSwapFactory.getPool(
+            address(ETH),
+            address(USD)
+        );
+        assert(ETHUSDPool != address(0));
+
+        vm.startPrank(USER2);
+        vm.expectRevert();
+        governance.vote(1);
     }
 
 }
