@@ -78,6 +78,10 @@ contract JoesSwapV3 is ReentrancyGuard {
     error PoolNotInitialized();
 
     constructor(address _token0, address _token1) {
+        if (
+            IERC20Metadata(_token0).decimals() < 18 ||
+            IERC20Metadata(_token1).decimals() < 18
+        ) revert("Only 18 decimals tokens allowed");
         token0 = IERC20(_token0);
         token1 = IERC20(_token1);
     }
