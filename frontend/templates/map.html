@@ -1,0 +1,19 @@
+{{ define "content" }}
+<h1>{{ .Heading }}</h1>
+<div>
+  {{ .Description }}
+</div>
+<div>
+  source:
+  <a
+    target="_blank"
+    href="{{ .Link }}"
+    >{{ .LinkText }}</a
+  >
+</div>
+
+<div id="map"></div>
+
+<script src="../static/js/{{ .Folder }}/mapdata.js"></script>
+<script src="../static/js/{{ .Folder }}/countrymap.js"></script>
+{{ end }}

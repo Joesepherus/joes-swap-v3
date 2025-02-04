@@ -1,0 +1,112 @@
+{{ define "content" }}
+<h1>{{ .Heading }}</h1>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<div class="mw6 center bg-light-gray pa4 br3 shadow-3">
+  <h2 class="f3 mb3">Swap Token 0</h2>
+  <form id="swapForm" class="flex flex-column">
+    <label class="mb2">Amount In:</label>
+    <input type="number" id="amountIn" class="pa2 mb3" required>
+
+    <label class="mb2">Amount In Max:</label>
+    <input type="number" id="amountInMax" class="pa2 mb3" required>
+
+    <button type="button" onclick="swapTokens()" class="bg-blue white pa2 br2 pointer">Swap</button>
+  </form>
+
+  <div id="balances">
+    <h3>Contract Token Balances</h3>
+    <p>Token0 Balance (Contract): <span id="contractToken0Balance">Loading...</span></p>
+    <p>Token1 Balance (Contract): <span id="contractToken1Balance">Loading...</span></p>
+
+    <h3>User Token Balances</h3>
+    <p>Token0 Balance (User): <span id="userToken0Balance">Loading...</span></p>
+    <p>Token1 Balance (User): <span id="userToken1Balance">Loading...</span></p>
+  </div>
+
+</div>
+
+<script>
+
+  const abi = [{"type": "constructor", "inputs": [{"name": "_token0", "type": "address", "internalType": "address"}, {"name": "_token1", "type": "address", "internalType": "address"}], "stateMutability": "nonpayable"}, {"type": "function", "name": "addLiquidity", "inputs": [{"name": "amount0", "type": "uint256", "internalType": "uint256"}], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "flashloan", "inputs": [{"name": "amount", "type": "uint256", "internalType": "uint256"}, {"name": "token", "type": "address", "internalType": "address"}], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "liquidity", "inputs": [], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "lpBalances", "inputs": [{"name": "", "type": "address", "internalType": "address"}], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "poolInitialized", "inputs": [], "outputs": [{"name": "", "type": "bool", "internalType": "bool"}], "stateMutability": "view"}, {"type": "function", "name": "removeLiquidity", "inputs": [], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "reserve0", "inputs": [], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "reserve1", "inputs": [], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "setupPoolLiquidity", "inputs": [{"name": "amount0", "type": "uint256", "internalType": "uint256"}, {"name": "amount1", "type": "uint256", "internalType": "uint256"}], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "swapToken0Amount", "inputs": [{"name": "amountIn", "type": "uint256", "internalType": "uint256"}, {"name": "amountInMax", "type": "uint256", "internalType": "uint256"}], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "swapToken1Amount", "inputs": [{"name": "amountIn", "type": "uint256", "internalType": "uint256"}, {"name": "amountInMax", "type": "uint256", "internalType": "uint256"}], "outputs": [], "stateMutability": "nonpayable"}, {"type": "function", "name": "token0", "inputs": [], "outputs": [{"name": "", "type": "address", "internalType": "contract IERC20"}], "stateMutability": "view"}, {"type": "function", "name": "token1", "inputs": [], "outputs": [{"name": "", "type": "address", "internalType": "contract IERC20"}], "stateMutability": "view"}, {"type": "function", "name": "userEntryFeePerLiquidityUnitToken0", "inputs": [{"name": "", "type": "address", "internalType": "address"}], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "userEntryFeePerLiquidityUnitToken1", "inputs": [{"name": "", "type": "address", "internalType": "address"}], "outputs": [{"name": "", "type": "uint256", "internalType": "uint256"}], "stateMutability": "view"}, {"type": "function", "name": "withdrawFees", "inputs": [], "outputs": [], "stateMutability": "nonpayable"}, {"type": "event", "name": "AddLiquidity", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "amount0", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "amount1", "type": "uint256", "indexed": true, "internalType": "uint256"}], "anonymous": false}, {"type": "event", "name": "Flashloan", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "amount", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "fee", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "token", "type": "address", "indexed": false, "internalType": "address"}], "anonymous": false}, {"type": "event", "name": "PoolInitialized", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "amount0", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "amount1", "type": "uint256", "indexed": true, "internalType": "uint256"}], "anonymous": false}, {"type": "event", "name": "RemoveLiquidity", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "liquidityToRemove", "type": "uint256", "indexed": false, "internalType": "uint256"}, {"name": "amount0", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "amount1", "type": "uint256", "indexed": true, "internalType": "uint256"}], "anonymous": false}, {"type": "event", "name": "Swap", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "amount0", "type": "uint256", "indexed": true, "internalType": "uint256"}, {"name": "amount1", "type": "uint256", "indexed": true, "internalType": "uint256"}], "anonymous": false}, {"type": "event", "name": "WithdrawFees", "inputs": [{"name": "sender", "type": "address", "indexed": true, "internalType": "address"}, {"name": "feeAmount", "type": "uint256", "indexed": true, "internalType": "uint256"}], "anonymous": false}, {"type": "error", "name": "InsufficentFeesBalance", "inputs": []}, {"type": "error", "name": "InsufficentLiquidity", "inputs": []}, {"type": "error", "name": "PoolAlreadyInitialized", "inputs": []}, {"type": "error", "name": "PoolNotInitialized", "inputs": []}, {"type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": []}, {"type": "error", "name": "SafeERC20FailedOperation", "inputs": [{"name": "token", "type": "address", "internalType": "address"}]}]
+
+  async function swapTokens() {
+    if (!window.ethereum) {
+      alert("Please install MetaMask!");
+      return;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    console.log("signer", signer);
+
+    const contractAddress = "0x59f3562cFA45A8C4DA7343BF70a8BB5F6EE58a67";
+
+
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+
+    const amountIn = document.getElementById("amountIn").value;
+    console.log("amountIn", amountIn);
+    const amountInMax = document.getElementById("amountInMax").value;
+    console.log("amountInMax", amountInMax);
+
+    try {
+      const tx = await contract.swapToken0Amount(amountIn, amountInMax);
+      await tx.wait();
+      alert("Swap successful!");
+    } catch (error) {
+      console.error(error);
+      alert("Swap failed!");
+    }
+  }
+
+  async function getTokenBalances() {
+    if (!window.ethereum) {
+      alert("Please install MetaMask!");
+      return;
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+
+    const contractAddress = "0x59f3562cFA45A8C4DA7343BF70a8BB5F6EE58a67";
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    try {
+      const token0Address = await contract.token0();
+      const token1Address = await contract.token1();
+
+      const token0 = new ethers.Contract(token0Address, ["function balanceOf(address) view returns (uint256)"], signer);
+      const token1 = new ethers.Contract(token1Address, ["function balanceOf(address) view returns (uint256)"], signer);
+
+      const userAddress = await signer.getAddress();
+
+      // Fetch contract balance for both tokens
+      const contractToken0Balance = await token0.balanceOf(contractAddress);
+      const contractToken1Balance = await token1.balanceOf(contractAddress);
+
+      const userToken0Balance = await token0.balanceOf(userAddress);
+      const userToken1Balance = await token1.balanceOf(userAddress);
+
+      // Display contract balances in the UI
+      document.getElementById("contractToken0Balance").textContent = ethers.utils.formatUnits(contractToken0Balance, 18); // Assuming 18 decimals
+      document.getElementById("contractToken1Balance").textContent = ethers.utils.formatUnits(contractToken1Balance, 18); // Assuming 18 decimals
+
+      // Display user balances in the UI
+      document.getElementById("userToken0Balance").textContent = ethers.utils.formatUnits(userToken0Balance, 18); // Assuming 18 decimals
+      document.getElementById("userToken1Balance").textContent = ethers.utils.formatUnits(userToken1Balance, 18); // Assuming 18 decimals
+
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to get token balances.");
+    }
+  }
+
+  // Call getTokenBalances when the page loads
+  window.onload = getTokenBalances;
+
+</script>
+
+{{ end }}

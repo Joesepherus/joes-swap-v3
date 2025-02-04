@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="icon" href="static/images/icon.png" type="image/x-icon" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"
+    />
+  </head>
+
+  <body id="home">
+    <header>
+      <nav class="flex justify-between bg-black bb b--black-10">
+        <a
+          class="link white-70 hover-white no-underline flex items-center"
+          href="/"
+        >
+          <img
+            width="auto"
+            height="50px"
+            src="/static/images/logo.png"
+            alt="Restaurant Logo"
+          />
+        </a>
+        <div class="flex-grow pa3 flex items-center">
+          <a class="f6 link dib white dim mr3 mr4-ns" href="/">Home</a>
+          <a class="f6 link dib white dim mr3 mr4-ns" href="/about">About</a>
+          <a class="f6 link dib white dim mr3 mr4-ns" href="/contact"
+            >Contact</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <div class="content">{{ block "content" . }}{{ end }}</div>
+
+    <footer class="bg-black">
+      <p>&copy; 2024 Joes Experiences. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
