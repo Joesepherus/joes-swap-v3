@@ -6,6 +6,12 @@ import {JoesSwapFactory} from "../src/JoesSwapFactory.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
+/**
+ * @title JoesGovernance
+ * @author Joesepherus
+ * @dev A governance contract for managing proposals related to pool creation and fee changes on the JoesSwap platform.
+ * This contract allows token holders to create proposals, vote on them, and execute approved proposals.
+ */
 contract JoesGovernance {
     using SafeERC20 for IERC20;
     JoesSwapFactory public joesSwapFactory;
@@ -40,11 +46,21 @@ contract JoesGovernance {
     );
     event Voted(uint256 indexed proposalId, address indexed voter);
 
+    /**
+     * @dev Initializes the governance contract with the token address for voting.
+     * @param _token The address of the token used for voting.
+     */
     constructor(address _token) {
         joesSwapFactory = new JoesSwapFactory();
         token = IERC20(_token);
     }
 
+    /**
+     * @dev Allows users to create a new proposal.
+     * @param description The description of the proposal.
+     * @param _proposalType The type of the proposal (CREATE_POOL or CHANGE_FEE).
+     * @param data The data related to the proposal (e.g., addresses for pool creation or fee value).
+     */
     function createProposal(
         string memory description,
         ProposalType _proposalType,
@@ -65,6 +81,15 @@ contract JoesGovernance {
         emit ProposalCreated(proposalCount, description, msg.sender);
     }
 
+    /**
+     * @dev Allows users to vote on a proposal.
+     * @param proposalId The ID of the proposal to vote on.
+     * Requirements:
+     * - User must not have voted already on the proposal.
+     * - Proposal must not have been executed.
+     * - Voting must be within the voting period.
+     * - User must own tokens to vote.
+     */
     function vote(uint256 proposalId) external {
         Proposal storage proposal = proposals[proposalId];
         require(
@@ -82,6 +107,13 @@ contract JoesGovernance {
         emit Voted(proposalId, msg.sender);
     }
 
+    /**
+     * @dev Executes the proposal if it has received enough votes.
+     * @param proposalId The ID of the proposal to execute.
+     * Requirements:
+     * - Proposal must have received at least the quorum percentage of votes.
+     * - Proposal type determines the action to be executed (e.g., pool creation or fee change).
+     */
     function executeProposal(uint256 proposalId) external {
         Proposal storage proposal = proposals[proposalId];
         uint256 totalSupply = token.totalSupply();
@@ -104,6 +136,11 @@ contract JoesGovernance {
         }
     }
 
+    /**
+     * @dev Retrieves a proposal by its ID.
+     * @param proposalId The ID of the proposal.
+     * @return The Proposal struct containing proposal details.
+     */
     function getProposal(
         uint256 proposalId
     ) external view returns (Proposal memory) {
