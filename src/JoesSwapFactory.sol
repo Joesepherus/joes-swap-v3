@@ -1,8 +1,15 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
 import {JoesSwapV3} from "./JoesSwapV3.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
+/**
+ * @title JoesSwapFactory
+ * @author Joesepherus
+ * @dev This contract manages the creation of liquidity pools between different token pairs.
+ * The owner of the contract can create new pools and manage existing ones.
+ */
 contract JoesSwapFactory is Ownable {
     mapping(address => mapping(address => address)) public getPool;
     address[] public pools;
@@ -12,8 +19,20 @@ contract JoesSwapFactory is Ownable {
         address indexed pool
     );
 
+
+    /**
+     * @dev Initializes the contract and sets the owner.
+     * @notice The owner is the address that deploys the contract.
+     */
     constructor() Ownable(msg.sender) {}
 
+    /**
+     * @dev Allows the owner to create a new liquidity pool between two tokens.
+     * @param tokenA The address of token A in the pool.
+     * @param tokenB The address of token B in the pool.
+     * @return pool The address of the newly created liquidity pool.
+     * @notice Only the owner can create pools. Pools can only be created if the token pair does not already exist.
+     */
     function createPool(
         address tokenA,
         address tokenB
@@ -29,7 +48,11 @@ contract JoesSwapFactory is Ownable {
         emit CreatedPool(tokenA, tokenB, pool);
     }
 
-    // @FIXME: add changeFee logic and add it in JoesSwapV3 so that the already collected
-    // fee is adjusted, not that all of a sudden they get much more than they are supposed to
+    /**
+     * @dev Allows the owner to change the fee structure for all pools.
+     * @param fee The new fee value (the logic for changing the fee will be added later).
+     * @notice This function is not yet implemented and will require further development.
+     * @fixme Add logic to change the fee and ensure that the existing collected fees are adjusted accordingly.
+     */
     function changeFee(uint256 fee) external onlyOwner() {}
 }
