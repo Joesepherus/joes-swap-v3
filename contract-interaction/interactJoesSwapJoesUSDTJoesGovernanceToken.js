@@ -19,7 +19,7 @@ const contractABI = [{ "type": "constructor", "inputs": [{ "name": "_token0", "t
 
 
 
-const contract = new ethers.Contract('0x59f3562cFA45A8C4DA7343BF70a8BB5F6EE58a67', contractABI, wallet);
+const contract = new ethers.Contract('0x2e93f22605B1f56cA9bD19Bc3FcD721425B6bB9a', contractABI, wallet);
 
 
 async function addLiquidity() {
@@ -64,6 +64,16 @@ async function addLiquidity() {
   console.log("Transaction mined:", receipt);
 }
 
+
+async function withdrawFees() {
+  const tx = await contract.withdrawFees();
+  console.log("tx", tx);
+
+  const receipt = await tx.wait();
+
+  console.log("Transaction mined:", receipt);
+}
+
 async function removeLiquidity() {
   const tx = await contract.removeLiquidity();
   console.log("tx", tx);
@@ -91,12 +101,21 @@ async function getReserves() {
   console.log("reserve1", reserve1);
 }
 
+async function getTokens() {
+  const token0 = await contract.token0();
+  const token1 = await contract.token1();
+  console.log("token0", token0);
+  console.log("token1", token1);
+}
+
 async function main() {
 //   getReserves();
 //  setupPoolLiquidity();
 //    addLiquidity();
 //    swapToken0Amount();
-      removeLiquidity();
+//      withdrawFees();
+//      removeLiquidity();
+        getTokens();
 }
 
 main();

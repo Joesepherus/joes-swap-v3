@@ -33,7 +33,7 @@ async function mint(index) {
 
 async function approve() {
   const amount = BigInt(100000000) * BigInt(10 ** 18);
-  const tx = await contract.approve("0x59f3562cFA45A8C4DA7343BF70a8BB5F6EE58a67", amount);
+  const tx = await contract.approve("0x2e93f22605B1f56cA9bD19Bc3FcD721425B6bB9a", amount);
   console.log("tx", tx);
 
   const receipt = await tx.wait();
