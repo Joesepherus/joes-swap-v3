@@ -64,6 +64,15 @@ async function addLiquidity() {
   console.log("Transaction mined:", receipt);
 }
 
+async function removeLiquidity() {
+  const tx = await contract.removeLiquidity();
+  console.log("tx", tx);
+
+  const receipt = await tx.wait();
+
+  console.log("Transaction mined:", receipt);
+}
+
 async function setupPoolLiquidity() {
   const amount0 = BigInt(10000) * BigInt(10 ** 18);
   const amount1 = BigInt(5000) * BigInt(10 ** 18);
@@ -86,7 +95,8 @@ async function main() {
 //   getReserves();
 //  setupPoolLiquidity();
 //    addLiquidity();
-    swapToken0Amount();
+//    swapToken0Amount();
+      removeLiquidity();
 }
 
 main();
