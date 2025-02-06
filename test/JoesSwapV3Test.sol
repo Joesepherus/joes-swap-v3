@@ -23,7 +23,7 @@ contract JoesSwapV3Test is Test {
         token0 = new ERC20Mock("Token0", "T0");
         token1 = new ERC20Mock("Token1", "T1");
 
-        uint256 STARTING_AMOUNT = 1_000_000;
+        uint256 STARTING_AMOUNT = 1_000_000 * PRECISION;
 
         vm.deal(owner, STARTING_AMOUNT);
         vm.deal(owner2, STARTING_AMOUNT);
@@ -47,8 +47,8 @@ contract JoesSwapV3Test is Test {
         token1.approve(address(joesSwapV3), STARTING_AMOUNT);
         vm.stopPrank();
 
-        uint256 amount0 = 10000;
-        uint256 amount1 = 1000;
+        uint256 amount0 = 10000 * PRECISION;
+        uint256 amount1 = 1000 * PRECISION;
         vm.prank(owner);
         joesSwapV3.setupPoolLiquidity(amount0, amount1);
         console.log("initialized", joesSwapV3.poolInitialized());
@@ -65,8 +65,8 @@ contract JoesSwapV3Test is Test {
     }
 
     function test_initializePoolTwice() public {
-        uint256 amount0 = 10000;
-        uint256 amount1 = 1000;
+        uint256 amount0 = 10000 * PRECISION;
+        uint256 amount1 = 1000 * PRECISION;
 
         console.log("initialized", joesSwapV3.poolInitialized());
         console.log("liquidity", joesSwapV3.liquidity());
@@ -76,7 +76,7 @@ contract JoesSwapV3Test is Test {
     }
 
     function test_addLiquidity() public {
-        uint256 amount0 = 500;
+        uint256 amount0 = 500 * PRECISION;
         uint256 reserve0Before = joesSwapV3.reserve0();
 
         vm.prank(owner);
@@ -95,50 +95,50 @@ contract JoesSwapV3Test is Test {
     }
 
     function test_swapToken0Amount() public {
-        uint256 swapAmount = 1000;
+        uint256 swapAmount = 1000 * PRECISION;
 
         vm.prank(owner);
-        joesSwapV3.swapToken0Amount(swapAmount, 1100);
+        joesSwapV3.swapToken0Amount(swapAmount, 1100 * PRECISION);
 
         vm.prank(owner);
         joesSwapV3.removeLiquidity();
     }
 
     function test_swapToken1Amount_1() public {
-        uint256 swapAmount = 10;
+        uint256 swapAmount = 10 * PRECISION;
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 123);
+        joesSwapV3.swapToken1Amount(swapAmount, 123 * PRECISION);
 
         vm.prank(owner);
         joesSwapV3.removeLiquidity();
     }
 
     function test_swapToken1Amount_2() public {
-        uint256 swapAmount = 333;
+        uint256 swapAmount = 333 * PRECISION;
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 10000);
+        joesSwapV3.swapToken1Amount(swapAmount, 10000 * PRECISION);
 
         vm.prank(owner);
         joesSwapV3.withdrawFees();
     }
 
     function test_swapToken1Amount_3() public {
-        uint256 swapAmount = 100;
-        uint256 amount0 = 10000;
+        uint256 swapAmount = 100 * PRECISION;
+        uint256 amount0 = 10000 * PRECISION;
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 10000);
+        joesSwapV3.swapToken1Amount(swapAmount, 10000 * PRECISION);
 
         vm.prank(owner2);
         joesSwapV3.addLiquidity(amount0);
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 10000);
+        joesSwapV3.swapToken1Amount(swapAmount, 10000 * PRECISION);
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 10000);
+        joesSwapV3.swapToken1Amount(swapAmount, 10000 * PRECISION);
 
         vm.prank(owner);
         joesSwapV3.withdrawFees();
@@ -148,7 +148,7 @@ contract JoesSwapV3Test is Test {
         joesSwapV3.removeLiquidity();
 
         vm.prank(owner);
-        joesSwapV3.swapToken1Amount(swapAmount, 10000);
+        joesSwapV3.swapToken1Amount(swapAmount, 10000 * PRECISION);
 
         vm.prank(owner2);
         joesSwapV3.withdrawFees();
@@ -165,8 +165,8 @@ contract JoesSwapV3Test is Test {
     }
 
     function test_flashloan() public {
-        flashloanReceiver.flashloan(300, address(token0));
-        flashloanReceiver.flashloan(100, address(token1));
+        flashloanReceiver.flashloan(300 * PRECISION, address(token0));
+        flashloanReceiver.flashloan(100 * PRECISION, address(token1));
     }
 
     function sqrt(uint256 x) internal pure returns (uint256 y) {
