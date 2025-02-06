@@ -52,7 +52,7 @@ contract JoesSwapFactory is Ownable {
      * @dev Allows the owner to change the fee structure for all pools.
      * @param fee The new fee value (the logic for changing the fee will be added later).
      * @notice This function is not yet implemented and will require further development.
-     * @fixme Add logic to change the fee and ensure that the existing collected fees are adjusted accordingly.
      */
+    // fixme Add logic to change the fee and ensure that the existing collected fees are adjusted accordingly.
     function changeFee(uint256 fee) external onlyOwner() {}
 }
