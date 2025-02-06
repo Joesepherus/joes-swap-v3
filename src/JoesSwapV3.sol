@@ -102,8 +102,8 @@ contract JoesSwapV3 is ReentrancyGuard {
      */
     function setupPoolLiquidity(uint256 amount0, uint256 amount1) external {
         if (poolInitialized) revert PoolAlreadyInitialized();
-        uint256 amount0Scaled = amount0 * PRECISION;
-        uint256 amount1Scaled = amount1 * PRECISION;
+        uint256 amount0Scaled = amount0;
+        uint256 amount1Scaled = amount1;
         uint256 newLiquidity = sqrt(amount0Scaled * amount1Scaled);
 
         reserve0 += amount0;
@@ -138,12 +138,9 @@ contract JoesSwapV3 is ReentrancyGuard {
     function addLiquidity(uint256 amount0) external nonReentrant {
         if (!poolInitialized) revert PoolNotInitialized();
 
-        uint256 amount0Scaled = amount0 * PRECISION;
+        uint256 amount1 = getAmountOut(amount0);
 
-        uint256 amount1Scaled = getAmountOut(amount0Scaled);
-        uint256 amount1 = amount1Scaled / PRECISION;
-
-        uint256 newLiquidity = sqrt(amount0Scaled * amount1Scaled);
+        uint256 newLiquidity = sqrt(amount0 * amount1);
 
         reserve0 += amount0;
         reserve1 += amount1;
@@ -215,12 +212,10 @@ contract JoesSwapV3 is ReentrancyGuard {
         uint256 amountInMax
     ) external nonReentrant {
         if (!poolInitialized) revert PoolNotInitialized();
-        uint256 scaledAmountIn = amountIn * PRECISION;
 
-        uint256 amountOutScaled = getAmountOut(scaledAmountIn);
-        if (amountOutScaled < PRECISION) revert("Amount out too small");
-        uint256 amountOutRounded = roundDownToNearestWhole(amountOutScaled);
-        uint256 amountOut = amountOutRounded / PRECISION;
+        uint256 amountOut = getAmountOut(amountIn);
+        if (amountOut < PRECISION) revert("Amount out too small");
+        uint256 amountOutRounded = roundDownToNearestWhole(amountOut);
 
         uint256 amountInCorrect = getAmountIn(amountOutRounded);
 
@@ -228,17 +223,15 @@ contract JoesSwapV3 is ReentrancyGuard {
         uint256 amountInAfterFee = amountInCorrect + feeAmount;
 
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
-        uint256 amountInSlippageFree = amountInRouded / PRECISION;
+        uint256 amountInSlippageFree = amountInRouded;
 
         if (amountInSlippageFree > amountInMax)
             revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
-        accumulatedFeePerLiquidityUnitToken0 +=
-            (feeAmount * PRECISION) /
-            liquidity;
+        accumulatedFeePerLiquidityUnitToken0 += (feeAmount * PRECISION) / liquidity;
 
-        reserve0 += scaledAmountIn / PRECISION;
+        reserve0 += amountIn;
         reserve1 -= amountOut;
 
         emit Swap(msg.sender, amountInSlippageFree, amountOut);
@@ -273,30 +266,27 @@ contract JoesSwapV3 is ReentrancyGuard {
         uint256 amountInMax
     ) external nonReentrant {
         if (!poolInitialized) revert PoolNotInitialized();
-        uint256 scaledAmountIn = amountIn * PRECISION;
-
-        uint256 amountOutScaled = getAmountIn(scaledAmountIn);
+        uint256 amountOutScaled = getAmountIn(amountIn);
         if (amountOutScaled < PRECISION) revert("Amount out too small");
         uint256 amountOutRounded = roundDownToNearestWhole(amountOutScaled);
-        uint256 amountOut = amountOutRounded / PRECISION;
+        uint256 amountOut = amountOutRounded;
 
         uint256 amountInCorrect = getAmountOut(amountOutRounded);
 
         uint256 feeAmount = (amountInCorrect * FEE) / ONE_HUNDRED;
+        console.log("feeAmount", feeAmount);
         uint256 amountInAfterFee = amountInCorrect + feeAmount;
 
         uint256 amountInRouded = roundUpToNearestWhole(amountInAfterFee);
-        uint256 amountInSlippageFree = amountInRouded / PRECISION;
+        uint256 amountInSlippageFree = amountInRouded;
 
         if (amountInSlippageFree > amountInMax)
             revert("Slippage free amountIn too big");
         if (amountOut <= 0) revert("Invalid output amount");
 
-        accumulatedFeePerLiquidityUnitToken1 +=
-            (feeAmount * PRECISION) /
-            liquidity;
+        accumulatedFeePerLiquidityUnitToken1 += (feeAmount * PRECISION) / liquidity;
 
-        reserve1 += scaledAmountIn / PRECISION;
+        reserve1 += amountIn;
         reserve0 -= amountOut;
 
         emit Swap(msg.sender, amountInSlippageFree, amountOut);
@@ -323,13 +313,12 @@ contract JoesSwapV3 is ReentrancyGuard {
 
         uint256 feeShareScaledToken0 = ((accumulatedFeePerLiquidityUnitToken0 -
             userEntryFeePerLiquidityUnitToken0[msg.sender]) *
-            liquidityToRemove) / PRECISION;
-        uint256 feeShareToken0 = feeShareScaledToken0 / PRECISION;
-
+            liquidityToRemove)/ PRECISION;
+        uint256 feeShareToken0 = feeShareScaledToken0;
         uint256 feeShareScaledToken1 = ((accumulatedFeePerLiquidityUnitToken1 -
             userEntryFeePerLiquidityUnitToken1[msg.sender]) *
             liquidityToRemove) / PRECISION;
-        uint256 feeShareToken1 = feeShareScaledToken1 / PRECISION;
+        uint256 feeShareToken1 = feeShareScaledToken1;
 
         if (feeShareToken0 <= 0 && feeShareToken1 <= 0) {
             revert InsufficentFeesBalance();
@@ -423,11 +412,11 @@ contract JoesSwapV3 is ReentrancyGuard {
      * @dev The function calculates and returns the token1 compared to token0 amount
      */
     function getAmountOut(uint256 amountIn) internal view returns (uint256) {
-        uint256 k = reserve0 * PRECISION * reserve1 * PRECISION;
-        uint256 newReserve0 = reserve0 * PRECISION + amountIn;
+        uint256 k = reserve0 * reserve1;
+        uint256 newReserve0 = reserve0 + amountIn;
         uint256 newReserve1 = k / newReserve0;
 
-        return reserve1 * PRECISION - newReserve1;
+        return reserve1 - newReserve1;
     }
 
     /**
@@ -436,11 +425,11 @@ contract JoesSwapV3 is ReentrancyGuard {
      * @param amountOut The amount of token1
      */
     function getAmountIn(uint256 amountOut) internal view returns (uint256) {
-        uint256 k = reserve0 * PRECISION * reserve1 * PRECISION;
-        uint256 newReserve1 = reserve1 * PRECISION - amountOut;
+        uint256 k = reserve0 * reserve1;
+        uint256 newReserve1 = reserve1 - amountOut;
         uint256 newReserve0 = k / newReserve1;
 
-        return newReserve0 - reserve0 * PRECISION;
+        return newReserve0 - reserve0;
     }
 
     /**
