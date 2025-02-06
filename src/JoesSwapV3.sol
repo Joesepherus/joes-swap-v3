@@ -36,6 +36,7 @@ contract JoesSwapV3 is ReentrancyGuard {
     uint256 immutable PRECISION = 1e18;
     uint256 immutable FEE = 3;
     uint256 immutable ONE_HUNDRED = 100;
+    uint256 immutable EIGTHEEN = 18;
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS
@@ -79,8 +80,8 @@ contract JoesSwapV3 is ReentrancyGuard {
 
     constructor(address _token0, address _token1) {
         if (
-            IERC20Metadata(_token0).decimals() < 18 ||
-            IERC20Metadata(_token1).decimals() < 18
+            IERC20Metadata(_token0).decimals() != EIGTHEEN ||
+            IERC20Metadata(_token1).decimals() != EIGTHEEN
         ) revert("Only 18 decimals tokens allowed");
         token0 = IERC20(_token0);
         token1 = IERC20(_token1);
